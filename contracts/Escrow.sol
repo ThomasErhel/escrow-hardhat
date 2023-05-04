@@ -24,4 +24,15 @@ contract Escrow {
 		emit Approved(balance);
 		isApproved = true;
 	}
+
+	event Canceled(uint);
+
+	function cancel() external {
+	require(msg.sender == depositor, "Only depositor can cancel");
+	require(!isApproved, "Cannot cancel an approved escrow");
+	uint balance = address(this).balance;
+	(bool sent, ) = payable(depositor).call{value: balance}("");
+	require(sent, "Failed to send Ether");
+	emit Canceled(balance);
+	}
 }
